@@ -139,16 +139,56 @@ public class ProjectDao {
 
 	public int update(Project project) {
 		int result = -1;
+		int index = -1;
 		Connection conn = MySqlConnection.getConnection();
 		String query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ?, owner = ? WHERE id = ?";
+		
+		if(project.getStart_date().isEmpty() || project.getStart_date().isBlank()) {
+			if(project.getEnd_date().isEmpty() || project.getEnd_date().isBlank()) {
+				query = "UPDATE project SET name = ?, description = ?, owner = ? WHERE id = ?";
+				index = 1;
+			}else {
+				query = "UPDATE project SET name = ?, description = ?, end_date = ?, owner = ? WHERE id = ?";
+				index = 2;
+			}
+		}else {
+			if(!project.getEnd_date().isEmpty() || !project.getEnd_date().isBlank()) {
+				query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ?, owner = ? WHERE id = ?";
+				index = 3;
+			}else {
+				query = "UPDATE project SET name = ?, description = ?, start_date = ?, owner = ? WHERE id = ?";
+				index = 4;
+			}
+			
+		}
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, project.getName());
-			ps.setString(2, project.getDescription());
-			ps.setString(3, project.getStart_date());
-			ps.setString(4, project.getEnd_date());
-			ps.setInt(5, project.getOwner().getId());
-			ps.setInt(6, project.getId());
+			ps.setString(2, project.getDescription());			
+			switch (index) {
+			case 1:
+				ps.setInt(3, project.getOwner().getId());
+				ps.setInt(4, project.getId());
+				break;
+			case 2:;
+				ps.setString(3, project.getEnd_date());
+				ps.setInt(4, project.getOwner().getId());
+				ps.setInt(5, project.getId());
+				break;
+			case 3:
+				ps.setString(3, project.getStart_date());
+				ps.setString(4, project.getEnd_date());
+				ps.setInt(5, project.getOwner().getId());
+				ps.setInt(6, project.getId());
+				break;
+			case 4:
+				ps.setString(3, project.getStart_date());
+				ps.setInt(4, project.getOwner().getId());
+				ps.setInt(5, project.getId());
+				break;
+			default:
+				break;
+			}
 			
 			result = ps.executeUpdate();
 		} catch (Exception e) {
