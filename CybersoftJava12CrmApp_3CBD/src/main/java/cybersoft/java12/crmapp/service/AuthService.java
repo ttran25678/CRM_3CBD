@@ -23,7 +23,10 @@ public class AuthService {
 			e.printStackTrace();
 			return false;
 		}
-		return true;
+		if(email.equals(dto.getEmail()) && password.equals(dto.getPassword())) {
+			return true;
+		}
+		return false;
 //		if(dto == null)
 //			return false;
 //		

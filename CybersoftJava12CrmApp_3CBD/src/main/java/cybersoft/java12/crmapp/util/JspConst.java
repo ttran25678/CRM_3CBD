@@ -10,6 +10,7 @@ public class JspConst {
 	// PROJECT
 	public static final String PROJECT_DASHBOARD = "/WEB-INF/views/project/project-dashboard.jsp";
 	public static final String PROJECT_ADD = "/WEB-INF/views/project/project-add.jsp";
+	public static final String PROJECT_UPDATE = "/WEB-INF/views/project/project-update.jsp";
 	public static final String PROJECT_STAFF = "/WEB-INF/views/project/project-staffs.jsp";
 	
 	// ROLE
