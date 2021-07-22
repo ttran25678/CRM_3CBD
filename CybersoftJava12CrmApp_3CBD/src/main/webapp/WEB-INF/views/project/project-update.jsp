@@ -1,3 +1,4 @@
+<%@page import="cybersoft.java12.crmapp.util.DBConst"%>
 <%@page import="cybersoft.java12.crmapp.model.Project"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.Statement"%>
@@ -122,8 +123,8 @@
 	                    		<%
 	                    		try{
 	                    			String query = "select * from user";
-	                    			Class.forName("com.mysql.cj.jdbc.Driver");
-	                    			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/crm","root","1234");
+	                    			Class.forName(DBConst.DRIVER);
+	                    			Connection conn = DriverManager.getConnection(DBConst.URL, DBConst.USERNAME, DBConst.PASSWORD);
 	                    			Statement stm = conn.createStatement();
 	                    			ResultSet rs = stm.executeQuery(query);
 	                    			Project pro = new Project();
