@@ -52,7 +52,12 @@
 		                           <td>${project.description }</td>
 		                           <td>${project.start_date }</td>
 		                           <td>${project.end_date }</td>
-		                           <td>${project.owner.id }</td>
+		                           
+		                           <c:choose>
+		                           	<c:when test="${project.owner.id == 0 }"><td></td></c:when>
+		                           	<c:otherwise><td>${project.owner.id }</td></c:otherwise>
+		                           </c:choose>
+		                           
 		                           <td>
 		                           	<a href="<c:url value="<%=UrlConst.PROJECT_UPDATE %>"/>?id=${project.id}" class="text-muted">
 		                           		<i class="material-icons">settings</i>

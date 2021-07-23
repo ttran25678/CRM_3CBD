@@ -30,7 +30,8 @@ public class ProjectService {
 		
 		if(result == -1)
 			System.out.println("Not update !");
-		System.out.println("Update completed !");
+		else
+			System.out.println("Update completed !");
 		
 	}
 
@@ -39,12 +40,22 @@ public class ProjectService {
 		
 		if(result == -1)
 			System.out.println("Not delete !");
-		System.out.println("Delete completed !");
+		else
+			System.out.println("Delete completed !");
 		
 	}
 
 	public Project findProjectById(int code) {
 		return dao.findProjectById(code);
+	}
+
+	public void add(Project project) {
+		int result = dao.addNewProject(project);
+		
+		if(result == -1)
+			System.out.println("Not create !");
+		else
+			System.out.println("Add new Project completed !");
 	}
 
 	

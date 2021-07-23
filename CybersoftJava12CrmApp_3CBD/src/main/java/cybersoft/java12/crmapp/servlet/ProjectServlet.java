@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import cybersoft.java12.crmapp.model.Project;
 import cybersoft.java12.crmapp.model.User;
 import cybersoft.java12.crmapp.service.ProjectService;
-import cybersoft.java12.crmapp.service.UserService;
 import cybersoft.java12.crmapp.util.JspConst;
 import cybersoft.java12.crmapp.util.UrlConst;
 
@@ -28,13 +27,11 @@ import cybersoft.java12.crmapp.util.UrlConst;
 })
 public class ProjectServlet extends HttpServlet {
 	private ProjectService service;
-	private UserService userService; 
 	
 	@Override
 	public void init() throws ServletException {
 		super.init();
 		service = new ProjectService();
-		userService = new UserService();
 	}
 	
 	@Override
@@ -47,7 +44,7 @@ public class ProjectServlet extends HttpServlet {
 			
 			break;
 		case UrlConst.PROJECT_ADD:
-			
+			getAddNewProject(req, resp);
 			break;
 		case UrlConst.PROJECT_UPDATE:
 			getUpdate(req, resp);
@@ -68,6 +65,11 @@ public class ProjectServlet extends HttpServlet {
 			
 			break;
 		}
+	}
+	
+	private void getAddNewProject(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher(JspConst.PROJECT_ADD)
+		.forward(req, resp);
 	}
 	
 	private void getUpdate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -98,7 +100,7 @@ public class ProjectServlet extends HttpServlet {
 			
 			break;
 		case UrlConst.PROJECT_ADD:
-			
+			postAddNewProject(req, resp);
 			break;
 		case UrlConst.PROJECT_UPDATE:
 			postUpdate(req, resp);
@@ -121,6 +123,21 @@ public class ProjectServlet extends HttpServlet {
 		}
 	}
 
+	private void postAddNewProject(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		Project project = new Project();
+		project.setName(req.getParameter("name"));
+		project.setDescription(req.getParameter("description"));
+		project.setStart_date(req.getParameter("start_date"));
+		project.setEnd_date(req.getParameter("end_date"));
+		User user = new User();
+		user.setId(Integer.parseInt(req.getParameter("owner")));
+		project.setOwner(user);
+		
+		service.add(project);
+		
+		resp.sendRedirect(req.getContextPath() + UrlConst.PROJECT_DASHBOARD);
+	}
+
 	private void postUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		
 		int code = Integer.parseInt(req.getParameter("id"));
@@ -133,7 +150,7 @@ public class ProjectServlet extends HttpServlet {
 		project.setEnd_date(req.getParameter("end_date"));
 		User user = new User();
 		user.setId(Integer.parseInt(req.getParameter("owner")));
-		System.out.println("--------------owner: "+Integer.parseInt(req.getParameter("owner")));
+		
 		project.setOwner(user);
 		
 		service.updateProduct(project);

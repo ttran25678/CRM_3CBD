@@ -12,10 +12,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Title</title>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 4 DatePicker</title>
+    <title>Update Project</title>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
@@ -108,37 +108,47 @@
 	                    <div class="row mt-3">
 	                        <div class="col-md-6">
 	                        	<label class="labels">Start date</label>
-	                        	<input type="text" class="datepicker_start" placeholder="yyyy-mm-dd" name="start_date" value="${project.start_date }" readonly>
+	                        	<input type="text" class="datepicker_start" placeholder="yyyy-mm-dd" name="start_date" value="${project.start_date }" id="start_date" readonly>
 	                        	
 	                        </div>
 	                        <div class="col-md-6">
 	                        	<label class="labels">End date</label>
-	                        	<input type="text" class="datepicker_end" placeholder="yyyy-mm-dd" name="end_date" value="${project.end_date }" readonly>
+	                        	<input type="text" class="datepicker_end" placeholder="yyyy-mm-dd" name="end_date" value="${project.end_date }" id="end_date" readonly>
 	                        </div>
 	                    </div>
 	                    <div class="row mt-3">
 	                    	<div class="col-md-12">
-	                    		<select class="custom-select" id="inputGroupSelect01" name="owner">
-	                    		<option value="${project.owner.id }" selected>${project.owner.id }</option>
-	                    		<%
-	                    		try{
-	                    			String query = "select * from user";
-	                    			Class.forName(DBConst.DRIVER);
-	                    			Connection conn = DriverManager.getConnection(DBConst.URL, DBConst.USERNAME, DBConst.PASSWORD);
-	                    			Statement stm = conn.createStatement();
-	                    			ResultSet rs = stm.executeQuery(query);
-	                    			Project pro = new Project();
-	                    			
-	                    			while(rs.next()){
-	                    				%>
-	                    				<option value="<%=rs.getString("id") %>"><%=rs.getString("id")%> </option>
-	                    				<%
-	                    			}	
-	                    		}catch(Exception e){
-	                    			e.printStackTrace();
-	                    		}
-	                    		%>
-	                    	</select>
+	                    		<label class="labels">Owner</label>
+	                    		<select class="custom-select" id="inputGroupSelect01" name="owner"> 
+		                    		<c:choose>
+		                    			<c:when test="${project.owner.id == 0}">
+		                    				<option value="-1" selected>No owner</option>
+		                    			</c:when>
+		                    			<c:otherwise>
+		                    				<option value="${project.owner.id }" selected>${project.owner.id }</option>
+		                    			</c:otherwise>
+		                    		</c:choose>
+
+	                    			<%
+		                    		try{
+		                    			String query = "select * from user";
+		                    			Class.forName(DBConst.DRIVER);
+		                    			Connection conn = DriverManager.getConnection(DBConst.URL, DBConst.USERNAME, DBConst.PASSWORD);
+		                    			Statement stm = conn.createStatement();
+		                    			ResultSet rs = stm.executeQuery(query);
+		                    			Project pro = new Project();
+		                    			
+		                    			while(rs.next()){
+		                    				%>
+		                    				<option value="<%=rs.getString("id") %>"><%=rs.getString("id")%> </option>
+		                    				<%
+		                    			}	
+		                    		}catch(Exception e){
+		                    			e.printStackTrace();
+		                    		}
+	                    			%>
+	                    		
+	                    		</select>
 	                    	</div>
 	                    </div>
 	                    <div class="mt-5 text-center">
@@ -163,6 +173,20 @@
 	        format: 'yyyy-mm-dd',
 	        startDate: '-3d'
 	    });
+	    
+
+	    $("#start_date, #end_date").datepicker();
+
+	    $("#end_date").change(function () {
+	        var start_date = document.getElementById("start_date").value;
+	        var end_date = document.getElementById("end_date").value;
+	     
+	        if ((Date.parse(end_date) <= Date.parse(start_date))) {
+	            alert("End date should be greater than Start date");
+	            document.getElementById("end_date").value = "";
+	        }
+	    });
+
 	</script>
 	
   </body>

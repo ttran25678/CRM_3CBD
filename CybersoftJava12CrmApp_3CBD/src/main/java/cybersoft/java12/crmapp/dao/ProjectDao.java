@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import cybersoft.java12.crmapp.dbconnection.MySqlConnection;
@@ -15,13 +14,12 @@ import cybersoft.java12.crmapp.model.User;
 public class ProjectDao {
 	
 	public List<Project> findAll() throws SQLException {
-		List<User> users = new LinkedList<>();
 		List<Project> projects = new ArrayList<>();
 		
 		Connection connection = MySqlConnection.getConnection();
-		String query = "select p.id as pid, p.name as pname, p.description as pdescription, p.start_date as pstart, p.end_date as pend, p.owner as powner, u.email as uemail, u.name as uname, u.address as uaddress, u.phone as uphone\r\n"
-				+ "from project as p, user as u\r\n"
-				+ "where p.owner = u.id";
+		String query = "select p.id as pid, p.name as pname, p.description as pdescription, p.start_date as pstart, p.end_date as pend, p.owner as powner\r\n"
+				+ "from project as p \r\n"
+				+ "order by p.id";
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			
@@ -35,26 +33,15 @@ public class ProjectDao {
 				pro.setDescription(resultSet.getString("pdescription"));
 				pro.setStart_date(resultSet.getString("pstart"));
 				pro.setEnd_date(resultSet.getString("pend"));				
-				
-				int owner_id = resultSet.getInt("powner");
-				User user = getUserFromList(users, owner_id);
-				
-				if(user == null) {
-					user = new User();
-					user.setId(resultSet.getInt("powner"));
-					user.setEmail(resultSet.getString("uemail"));
-					user.setName(resultSet.getString("uname"));
-					user.setAddress(resultSet.getString("uaddress"));
-					user.setPhone(resultSet.getString("uphone"));
-				
-					users.add(user);
-				}
+
+				User user = new User();
+				user.setId(resultSet.getInt("powner"));
 				
 				pro.setOwner(user);
-
+				
 				projects.add(pro);
 			}
-			
+	
 		} catch (SQLException e) {
 			System.out.println("findAll. Unable to connect to database.");
 			e.printStackTrace();
@@ -65,22 +52,10 @@ public class ProjectDao {
 		return projects;
 	}
 	
-	
-	private User getUserFromList(List<User> users, int userid) {
-		for(User user : users)
-			if(user.getId() == userid)
-				return user;
-		return null;
-	}
-
 	public Project findProjectById(int code) {
-		List<User> users = new LinkedList<>();
 		Project project = null;		
 		Connection conn = MySqlConnection.getConnection();
-		String query = "select p.id as id, p.name as name, p.description as description, p.start_date as start_date, p.end_date as end_date, p.owner as owner, \r\n"
-				+ "		u.name as uname, u.email as uemail, u.address as uaddress, u.phone as uphone\r\n"
-				+ "from project p, user u \r\n"
-				+ "where p.owner = u.id and p.id = ?";
+		String query = "select id, name, description, start_date, end_date, owner from project where id = ?;";
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setInt(1, code);
@@ -93,22 +68,10 @@ public class ProjectDao {
 				project.setDescription(rs.getString("description"));
 				project.setStart_date(rs.getString("start_date"));
 				project.setEnd_date(rs.getString("end_date"));
+				
+				User user = new User();
+				user.setId(rs.getInt("owner"));
 
-
-				int owner_id = rs.getInt("owner");
-				User user = getUserFromList(users, owner_id);
-				
-				if(user == null) {
-					user = new User();
-					user.setId(rs.getInt("owner"));
-					user.setEmail(rs.getString("uemail"));
-					user.setName(rs.getString("uname"));
-					user.setAddress(rs.getString("uaddress"));
-					user.setPhone(rs.getString("uphone"));
-				
-					users.add(user);
-				}
-				
 				project.setOwner(user);		
 			}
 			
@@ -141,50 +104,86 @@ public class ProjectDao {
 		int result = -1;
 		int index = -1;
 		Connection conn = MySqlConnection.getConnection();
-		String query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ?, owner = ? WHERE id = ?";
+		String query = "";
 		
-		if(project.getStart_date().isEmpty() || project.getStart_date().isBlank()) {
-			if(project.getEnd_date().isEmpty() || project.getEnd_date().isBlank()) {
-				query = "UPDATE project SET name = ?, description = ?, owner = ? WHERE id = ?";
-				index = 1;
+		if(project.getStart_date().isEmpty()) {
+			if(project.getEnd_date().isEmpty()) {
+				if(project.getOwner().getId() == -1) {
+					query = "UPDATE project SET name = ?, description = ? WHERE id = ?";
+					index = 1;
+				}else {
+					query = "UPDATE project SET name = ?, description = ?, owner = ? WHERE id = ?";
+					index = 2;
+				}
 			}else {
-				query = "UPDATE project SET name = ?, description = ?, end_date = ?, owner = ? WHERE id = ?";
-				index = 2;
+				if(project.getOwner().getId() == -1) {
+					query = "UPDATE project SET name = ?, description = ?, end_date = ? WHERE id = ?";
+					index = 3;
+				}else {
+					query = "UPDATE project SET name = ?, description = ?, end_date = ?, owner = ? WHERE id = ?";
+					index = 4;
+				}
 			}
 		}else {
-			if(!project.getEnd_date().isEmpty() || !project.getEnd_date().isBlank()) {
-				query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ?, owner = ? WHERE id = ?";
-				index = 3;
+			if(project.getEnd_date().isEmpty()) {
+				if(project.getOwner().getId() == -1) {
+					query = "UPDATE project SET name = ?, description = ?, start_date = ? WHERE id = ?";
+					index = 5;
+				}else {
+					query = "UPDATE project SET name = ?, description = ?, start_date = ?, owner = ? WHERE id = ?";
+					index = 6;
+				}
 			}else {
-				query = "UPDATE project SET name = ?, description = ?, start_date = ?, owner = ? WHERE id = ?";
-				index = 4;
+				if(project.getOwner().getId() == -1) {
+					query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ? WHERE id = ?";
+					index = 7;
+				}else {
+					query = "UPDATE project SET name = ?, description = ?, start_date = ?, end_date = ?, owner = ? WHERE id = ?";
+					index = 8;
+				}
 			}
-			
 		}
+
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, project.getName());
 			ps.setString(2, project.getDescription());			
 			switch (index) {
 			case 1:
+				ps.setInt(3, project.getId());
+				break;
+			case 2:
 				ps.setInt(3, project.getOwner().getId());
 				ps.setInt(4, project.getId());
 				break;
-			case 2:;
+			case 3:
+				ps.setString(3, project.getEnd_date());
+				ps.setInt(4, project.getId());
+				break;
+			case 4:
 				ps.setString(3, project.getEnd_date());
 				ps.setInt(4, project.getOwner().getId());
 				ps.setInt(5, project.getId());
 				break;
-			case 3:
+			case 5:
+				ps.setString(3, project.getStart_date());
+				ps.setInt(4, project.getId());
+				break;
+			case 6:
+				ps.setString(3, project.getStart_date());
+				ps.setInt(4, project.getOwner().getId());
+				ps.setInt(5, project.getId());
+				break;
+			case 7:
+				ps.setString(3, project.getStart_date());
+				ps.setString(4, project.getEnd_date());
+				ps.setInt(5, project.getId());
+				break;
+			case 8:
 				ps.setString(3, project.getStart_date());
 				ps.setString(4, project.getEnd_date());
 				ps.setInt(5, project.getOwner().getId());
 				ps.setInt(6, project.getId());
-				break;
-			case 4:
-				ps.setString(3, project.getStart_date());
-				ps.setInt(4, project.getOwner().getId());
-				ps.setInt(5, project.getId());
 				break;
 			default:
 				break;
@@ -193,6 +192,108 @@ public class ProjectDao {
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			System.out.println("update. Disconnected !");
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+
+	public int addNewProject(Project project) {
+		int result = -1;
+		String query = "";
+		int index = -1;
+		if(project.getStart_date().isEmpty()) {
+			if(project.getEnd_date().isEmpty()) {
+				if(project.getOwner().getId() == -1) {
+					query = "INSERT INTO project (name, description)\r\n"
+							+ "VALUE (?, ?)";
+					index = 1;
+				}else {
+					query = "INSERT INTO project (name, description, owner)\r\n"
+							+ "VALUE (?, ?, ?)";
+					index = 2;
+				}
+			}else {
+				if(project.getOwner().getId() == -1) {
+					query = "INSERT INTO project (name, description, end_date)\r\n"
+							+ "VALUE (?, ?, ?)";
+					index = 3;
+				}else {
+					query = "INSERT INTO project (name, description, end_date, owner)\r\n"
+							+ "VALUE (?, ?, ?, ?)";
+					index = 4;
+				}
+			}
+		}else {
+			if(project.getEnd_date().isEmpty()) {
+				if(project.getOwner().getId() == -1) {
+					query = "INSERT INTO project (name, description, start_date)\r\n"
+							+ "VALUE (?, ?, ?)";
+					index = 5;
+				}else {
+					query = "INSERT INTO project (name, description, start_date, owner)\r\n"
+							+ "VALUE (?, ?, ?, ?)";
+					index = 6;
+				}
+			}else {
+				if(project.getOwner().getId() == -1) {
+					query = "INSERT INTO project (name, description, start_date, end_date)\r\n"
+							+ "VALUE (?, ?, ?, ?)";
+					index = 7;
+				}else {
+					query = "INSERT INTO project (name, description, start_date, end_date, owner)\r\n"
+							+ "VALUE (?, ?, ?, ?, ?)";
+					index = 8;
+				}
+			}
+		}
+		
+		Connection conn = MySqlConnection.getConnection();
+
+		try {
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, project.getName());
+			ps.setString(2, project.getDescription());
+			
+			switch (index) {
+			case 1:
+				// next
+				break;
+			case 2:
+				ps.setInt(3, project.getOwner().getId());
+				break;
+			case 3:
+				ps.setString(3, project.getEnd_date());
+				break;
+			case 4:
+				ps.setString(3, project.getEnd_date());
+				ps.setInt(4, project.getOwner().getId());
+				break;
+			case 5:
+				ps.setString(3, project.getStart_date());
+				break;
+			case 6:
+				ps.setString(3, project.getStart_date());
+				ps.setInt(4, project.getOwner().getId());
+				break;
+			case 7:
+				ps.setString(3, project.getStart_date());
+				ps.setString(4, project.getEnd_date());
+				break;
+			case 8:
+				ps.setString(3, project.getStart_date());
+				ps.setString(4, project.getEnd_date());
+				ps.setInt(5, project.getOwner().getId());
+				break;
+			default:
+				break;
+			}
+			
+			result = ps.executeUpdate();	
+			
+		} catch (Exception e) {
+			System.out.println("Add New Project. Disconnected !");
 			e.printStackTrace();
 		}
 		
