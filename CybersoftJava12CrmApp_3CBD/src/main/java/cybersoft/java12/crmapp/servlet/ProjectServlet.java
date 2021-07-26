@@ -23,7 +23,8 @@ import cybersoft.java12.crmapp.util.UrlConst;
 		UrlConst.PROJECT_DELETE,
 		UrlConst.PROJECT_STAFF,
 		UrlConst.PROJECT_STAFF_ADD,
-		UrlConst.PROJECT_STAFF_REMOVE
+		UrlConst.PROJECT_STAFF_REMOVE,
+		UrlConst.PROJECT_STAFF_DASHBOARD
 })
 public class ProjectServlet extends HttpServlet {
 	private ProjectService service;
@@ -53,7 +54,10 @@ public class ProjectServlet extends HttpServlet {
 			delete(req, resp);
 			break;
 		case UrlConst.PROJECT_STAFF:
-			
+			getProject(req, resp);
+			break;
+		case UrlConst.PROJECT_STAFF_DASHBOARD:
+			// add code vao load all user trong 1 project
 			break;
 		case UrlConst.PROJECT_STAFF_ADD:
 			
@@ -67,6 +71,24 @@ public class ProjectServlet extends HttpServlet {
 		}
 	}
 	
+	private void getProject(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		List<Project> projects =  service.findAllProject();
+		
+		req.setAttribute("projects", projects);
+		
+		req.getRequestDispatcher(JspConst.PROJECT_STAFF)
+			.forward(req, resp);
+	}
+	
+	private void getDashboard(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		List<Project> projects =  service.findAllProject();
+		
+		req.setAttribute("projects", projects);
+		
+		req.getRequestDispatcher(JspConst.PROJECT_DASHBOARD)
+			.forward(req, resp);
+	}
+
 	private void getAddNewProject(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.getRequestDispatcher(JspConst.PROJECT_ADD)
 		.forward(req, resp);
@@ -109,6 +131,9 @@ public class ProjectServlet extends HttpServlet {
 			
 			break;
 		case UrlConst.PROJECT_STAFF:
+			getProject(req, resp);
+			break;
+		case UrlConst.PROJECT_STAFF_DASHBOARD:
 			
 			break;
 		case UrlConst.PROJECT_STAFF_ADD:
@@ -159,12 +184,5 @@ public class ProjectServlet extends HttpServlet {
 
 	}
 
-	private void getDashboard(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		List<Project> projects =  service.findAllProject();
-		
-		req.setAttribute("projects", projects);
-		
-		req.getRequestDispatcher(JspConst.PROJECT_DASHBOARD)
-			.forward(req, resp);
-	}
+	
 }

@@ -23,6 +23,7 @@ public class UrlConst {
 	public static final String PROJECT_UPDATE = "/project/update";
 	public static final String PROJECT_DELETE = "/project/delete";
 	public static final String PROJECT_STAFF = "/project/staff";
+	public static final String PROJECT_STAFF_DASHBOARD = "/project/staff/dashboard";
 	public static final String PROJECT_STAFF_ADD = "/project/staff/add";
 	public static final String PROJECT_STAFF_REMOVE = "/project/staff/remove";
 	
