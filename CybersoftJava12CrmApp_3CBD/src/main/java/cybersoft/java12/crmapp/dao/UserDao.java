@@ -20,9 +20,9 @@ public class UserDao {
 		List<Role> roles = new ArrayList<>();
 		
 		Connection connection = MySqlConnection.getConnection();
-		String query = "SELECT u.id as id, u.name as name, u.email as email, "
-				+ "u.phone as phone, r.id as role_id, r.name as role_name, r.description as role_description "
-				+ "FROM user u, role r WHERE u.role_id = r.id";
+		String query = "SELECT u.id as id, u.name as name, u.email as email, u.address as address, u.phone as phone, \r\n"
+				+ "r.id as role_id, r.name as role_name, r.description as role_description \r\n"
+				+ "FROM user u, role r WHERE u.role_id = r.id ORDER BY u.id;";
 		  
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -35,6 +35,7 @@ public class UserDao {
 				user.setId(resultSet.getInt("id"));
 				user.setName(resultSet.getString("name"));
 				user.setEmail(resultSet.getString("email"));
+				user.setAddress(resultSet.getString("address"));
 				user.setPhone(resultSet.getString("phone"));
 				
 				int roleId = resultSet.getInt("role_id");
@@ -114,6 +115,75 @@ public class UserDao {
 		} finally {
 			connection.close();
 		}
+	}
+
+	public User findUserById(int id) {
+		User user = null;
+		Connection connection = MySqlConnection.getConnection();
+        String query = "SELECT u.id as uid, u.email as email, u.name as uname, u.address as address, u.phone as phone, r.id as rid, r.name as rname \r\n"
+        		+ "FROM user as u, role as r\r\n"
+        		+ "WHERE u.role_id = r.id and u.id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            
+            ResultSet resultSet = statement.executeQuery();
+          	while(resultSet.next()) {
+          		user = new User();
+          		user.setId(resultSet.getInt("uid"));
+            	user.setEmail(resultSet.getString("email"));
+            	user.setName(resultSet.getString("uname"));
+            	user.setAddress(resultSet.getString("address"));
+            	user.setPhone(resultSet.getString("phone"));
+            	user.setEmail(resultSet.getString("email"));
+            	
+            	Role role = new Role();
+            	role.setId(resultSet.getInt("rid"));
+            	role.setName(resultSet.getString("rname"));
+            	user.setRole(role);
+          	}
+            	
+                                
+        } catch (SQLException e) {
+            System.out.println("Unable to connect to database.");
+            e.printStackTrace();
+        } finally {
+        	try {
+				connection.close();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to database.");
+				e.printStackTrace();
+			}
+        }    
+        return user;
+	}
+
+	public int update(User user, int id) {
+		int result = -1;
+		Connection conn = MySqlConnection.getConnection();
+		String query = "UPDATE user SET email = ?, name = ?, address = ?, phone = ?, role_id = ? WHERE id = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, user.getEmail());
+			ps.setString(2, user.getName());
+			ps.setString(3, user.getAddress());
+			ps.setString(4, user.getPhone());
+			ps.setInt(5, user.getRole().getId());
+			ps.setInt(6, id);
+			result = ps.executeUpdate();
+			
+		} catch (Exception e) {
+			System.out.println("update. Disconnected !");
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 
 }

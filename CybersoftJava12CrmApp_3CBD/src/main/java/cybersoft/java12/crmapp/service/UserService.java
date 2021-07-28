@@ -45,4 +45,16 @@ public class UserService {
 		}
 	}
 
+	public User findUserById(int id) {
+		return dao.findUserById(id);
+	}
+
+	public void update(User user, int id) {
+		try {
+			dao.update(user, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

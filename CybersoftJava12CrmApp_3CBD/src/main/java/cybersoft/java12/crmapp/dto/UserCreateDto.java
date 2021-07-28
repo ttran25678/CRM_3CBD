@@ -1,7 +1,5 @@
 package cybersoft.java12.crmapp.dto;
 
-import cybersoft.java12.crmapp.model.Role;
-
 public class UserCreateDto {
 	/* Data Transfer Object */
 	private String email;

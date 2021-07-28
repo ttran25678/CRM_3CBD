@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cybersoft.java12.crmapp.dto.UserCreateDto;
+import cybersoft.java12.crmapp.model.Role;
 import cybersoft.java12.crmapp.model.User;
 import cybersoft.java12.crmapp.service.UserService;
 import cybersoft.java12.crmapp.util.JspConst;
@@ -55,24 +56,33 @@ public class UserServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		switch(req.getServletPath()) {
-		case UrlConst.USER_DASHBOARD:
-			
-			break;
-		case UrlConst.USER_PROFILE:
-			
-			break;
 		case UrlConst.USER_ADD:
 			postUserAdd(req,resp);
 			break;
 		case UrlConst.USER_UPDATE:
-			
-			break;
-		case UrlConst.USER_DELETE:
-			
+			postUpdate(req, resp);
 			break;
 		}
 	}
 	
+	private void postUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		int id = Integer.parseInt(req.getParameter("id"));
+		
+		User user = service.findUserById(id);
+		user.setEmail(req.getParameter("email"));
+		user.setName(req.getParameter("name"));
+		user.setAddress(req.getParameter("address"));
+		user.setPhone(req.getParameter("phone"));
+		
+		Role role = new Role();
+		role.setId(Integer.parseInt(req.getParameter("owner")));
+		user.setRole(role);
+		
+		service.update(user, id);
+		
+		resp.sendRedirect(req.getContextPath() + UrlConst.USER_DASHBOARD);
+	}
+
 	private void getUserDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		int id = Integer.parseInt(req.getParameter("id"));
 		
@@ -81,9 +91,12 @@ public class UserServlet extends HttpServlet {
 		resp.sendRedirect(req.getContextPath() + UrlConst.USER_DASHBOARD);
 	}
 
-	private void getUserUpdate(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
+	private void getUserUpdate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		int id = Integer.parseInt(req.getParameter("id"));      
+		User user = service.findUserById(id);
+		  
+		req.setAttribute("user", user);		  
+		req.getRequestDispatcher(JspConst.USER_UPDATE).forward(req, resp);
 	}
 
 	private void getUserAdd(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
