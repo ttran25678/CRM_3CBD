@@ -39,10 +39,13 @@
             <table class="table mb-0 thead-border-top-0">
                 <thead>
                     <tr>
+                    	<th>No</th>
+                    	<th>Id</th>
 						<th>Name</th>
 	                     <th>Email</th>
-	                     <th>Role</th>
+	                     <th>Address</th>
 	                     <th>Phone</th>
+	                     <th>Role</th>
 	                     <th>#</th>
                     </tr>
                 </thead>
@@ -54,16 +57,24 @@
                  			</tr>
                  		</c:when>
                  		<c:otherwise>
-                 			<c:forEach var="user" items="${users}" >
+                 			<c:forEach var="user" varStatus="loopStatus" items="${users}" >
 	                 			<tr>
+	                 			   <td>
+		                               ${loopStatus.count }
+		                           </td>
+		                           <td>
+		                               ${user.id }
+		                           </td>
 		                           <td>
 		                               ${user.name }
 		                           </td>
 		                           <td>${user.email }</td>
-		                           <td><span class="badge badge-primary">${user.role.name }</span></td>
+		                           <td>${user.address }</td>
 		                           <td>${user.phone }</td>
+		                           <td><span class="badge badge-primary">${user.role.name }</span></td>
+		                           
 		                           <td>
-		                           	<a href="" class="text-muted"><i class="material-icons">settings</i></a>
+		                           	<a href="<c:url value="<%=UrlConst.USER_UPDATE%>" />?id=${user.id}" class="text-muted"><i class="material-icons">settings</i></a>
 		                           	<a href="<c:url value="<%=UrlConst.USER_DELETE%>" />?id=${user.id}" class="text-muted"><i class="material-icons">delete</i></a>
 		                           </td>
 	                    		</tr>

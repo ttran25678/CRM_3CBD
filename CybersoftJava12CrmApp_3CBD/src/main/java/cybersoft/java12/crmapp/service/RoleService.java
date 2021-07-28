@@ -35,11 +35,23 @@ public class RoleService {
         }
     }
 
-    public void add(RoleCreateDto roledto) {
+    public void add(Role role) {
         try {
-            dao.add(roledto);
+            dao.add(role);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+	public Role findRoleById(int id){
+		return dao.findRoleById(id);
+	}
+
+	public void updateRoleById(Role role, int id) {
+		try {
+            dao.update(role, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
 }

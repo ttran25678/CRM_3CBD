@@ -15,7 +15,7 @@
 	                <nav aria-label="breadcrumb">
 	                    <ol class="breadcrumb mb-0">
 	                        <li class="breadcrumb-item"><a href="<c:url value="<%=UrlConst.HOME %>" />">Home</a></li>
-	                        <li class="breadcrumb-item"><a href="#">Role</a></li>
+	                        <li class="breadcrumb-item"><a href="<c:url value="<%=UrlConst.ROLE_DASHBOARD %>" />">Role</a></li>
 	                        <li class="breadcrumb-item active" aria-current="page">
 	                            Role Dashboard
 	                        </li>
@@ -39,6 +39,8 @@
             <table class="table mb-0 thead-border-top-0">
                 <thead>
                     <tr>
+                    	<th>No</th>
+                    	<th>Id</th>
 						<th>Name</th>
 	                     <th>Description</th>
 	                     <th>#</th>
@@ -52,15 +54,21 @@
                  			</tr>
                  		</c:when>
                  		<c:otherwise>
-                 			<c:forEach var="role" items="${roles}" >
+                 			<c:forEach var="role" varStatus="loopStatus" items="${roles}" >
 	                 			<tr>
+	                 			   <td>${loopStatus.count }</td>
+	                 			   <td>
+		                               ${role.id }
+		                           </td>
 		                           <td>
 		                               ${role.name }
 		                           </td>
 		                           <td>${role.description }</td>
 		                           <td>
-		                           	<a href="" class="text-muted"><i class="material-icons">settings</i></a>
-		                           	<a href="<c:url value="<%=UrlConst.ROLE_DELETE%>" />?id=${user.id}" class="text-muted"><i class="material-icons">delete</i></a>
+		                           	<a href="<c:url value="<%=UrlConst.ROLE_UPDATE%>" />?id=${role.id}" class="text-muted"><i class="material-icons">settings</i></a>
+		                           	<a href="<c:url value="<%=UrlConst.ROLE_DELETE%>" />?id=${role.id}" class="text-muted"
+		                           		onclick="return confirm('Are you sure you want to delete this item?');">
+		                           	<i class="material-icons">delete</i></a>
 		                           </td>
 	                    		</tr>
                  			</c:forEach>
