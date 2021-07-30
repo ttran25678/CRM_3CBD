@@ -71,6 +71,7 @@
                                                 </div>
                                             </a>
                                         </div>
+                                     
                                         <div class="flex">
                                             Người dùng mới <a href="#">Trần Minh</a> đã đăng ký tài khoản<br />
                                             <small class="text-muted">1 giờ trước.</small>
@@ -120,14 +121,15 @@
                         <a href="#account_menu" class="nav-link dropdown-toggle" data-toggle="dropdown" data-caret="false">
                             <span class="avatar avatar-sm">
                                 <span class="avatar-title rounded-circle bg-warning">
-                                    ${username}
+                                    username
                                 </span>
                             </span>
                         </a>
                         <div id="account_menu" class="dropdown-menu dropdown-menu-right">
                             <div class="dropdown-item-text dropdown-item-text--lh">
                                 <div><strong>Thanh Tuấn</strong></div>
-                                <div>@tuanphan</div>
+                                <% %>
+                                <div>@email</div>
                             </div>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item active" href="<c:url value="<%=UrlConst.HOME %>" />">

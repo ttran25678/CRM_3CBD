@@ -2,7 +2,6 @@ package cybersoft.java12.crmapp.servlet;
 
 import java.io.IOException;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
