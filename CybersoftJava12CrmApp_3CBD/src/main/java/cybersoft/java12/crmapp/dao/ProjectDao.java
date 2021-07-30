@@ -17,8 +17,9 @@ public class ProjectDao {
 		List<Project> projects = new ArrayList<>();
 		
 		Connection connection = MySqlConnection.getConnection();
-		String query = "select p.id as pid, p.name as pname, p.description as pdescription, p.start_date as pstart, p.end_date as pend, p.owner as powner\r\n"
-				+ "from project as p \r\n"
+		String query = "select p.id as pid, p.name as pname, p.description as pdescription, p.start_date as pstart, p.end_date as pend, p.owner as powner, u.name as uname\r\n"
+				+ "from project as p, user as u\r\n"
+				+ "where p.owner = u.id\r\n"
 				+ "order by p.id";
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -36,6 +37,7 @@ public class ProjectDao {
 
 				User user = new User();
 				user.setId(resultSet.getInt("powner"));
+				user.setName(resultSet.getString("uname"));
 				
 				pro.setOwner(user);
 				

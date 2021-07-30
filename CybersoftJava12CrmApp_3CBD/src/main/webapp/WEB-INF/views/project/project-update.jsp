@@ -122,10 +122,10 @@
 	                    		<select class="custom-select" id="inputGroupSelect01" name="owner"> 
 		                    		<c:choose>
 		                    			<c:when test="${project.owner.id == 0}">
-		                    				<option value="-1" selected>No owner</option>
+		                    				<option value="-1" disabled selected>No owner</option>
 		                    			</c:when>
 		                    			<c:otherwise>
-		                    				<option value="${project.owner.id }" selected>${project.owner.id }</option>
+		                    				<option value="${project.owner.id }" disabled selected>${project.owner.id }</option>
 		                    			</c:otherwise>
 		                    		</c:choose>
 

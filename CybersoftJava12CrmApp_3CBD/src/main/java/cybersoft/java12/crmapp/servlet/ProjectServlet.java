@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cybersoft.java12.crmapp.model.Project;
+import cybersoft.java12.crmapp.model.ProjectUser;
 import cybersoft.java12.crmapp.model.User;
 import cybersoft.java12.crmapp.service.ProjectService;
 import cybersoft.java12.crmapp.util.JspConst;
@@ -23,8 +24,8 @@ import cybersoft.java12.crmapp.util.UrlConst;
 		UrlConst.PROJECT_DELETE,
 		UrlConst.PROJECT_STAFF,
 		UrlConst.PROJECT_STAFF_ADD,
-		UrlConst.PROJECT_STAFF_REMOVE,
-		UrlConst.PROJECT_STAFF_DASHBOARD
+		UrlConst.PROJECT_STAFF_DELETE,
+		UrlConst.PROJECT_STAFF_UPDATE
 })
 public class ProjectServlet extends HttpServlet {
 	private ProjectService service;
@@ -54,16 +55,16 @@ public class ProjectServlet extends HttpServlet {
 			delete(req, resp);
 			break;
 		case UrlConst.PROJECT_STAFF:
-			getProject(req, resp);
-			break;
-		case UrlConst.PROJECT_STAFF_DASHBOARD:
-			// add code vao load all user trong 1 project
+			getProjectStaff(req, resp);
 			break;
 		case UrlConst.PROJECT_STAFF_ADD:
-			
+			getProjectStaffAdd(req, resp);
 			break;
-		case UrlConst.PROJECT_STAFF_REMOVE:
-			
+		case UrlConst.PROJECT_STAFF_DELETE:
+			getStaffDelete(req, resp);
+			break;
+		case UrlConst.PROJECT_STAFF_UPDATE:
+			getStaffUpdate(req, resp);
 			break;
 		default:
 			
@@ -71,10 +72,36 @@ public class ProjectServlet extends HttpServlet {
 		}
 	}
 	
-	private void getProject(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		List<Project> projects =  service.findAllProject();
+	private void getStaffUpdate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		int uid = Integer.parseInt(req.getParameter("uid"));
+		int pid = Integer.parseInt(req.getParameter("pid"));
+
+		ProjectUser pUser = service.findStaff(uid, pid);
 		
-		req.setAttribute("projects", projects);
+		req.setAttribute("projectUser", pUser);
+		
+		req.getRequestDispatcher(JspConst.PROJECT_STAFF_UPDATE).forward(req, resp);
+	}
+
+	private void getStaffDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		int uid = Integer.parseInt(req.getParameter("uid"));
+		int pid = Integer.parseInt(req.getParameter("pid"));
+
+		service.deleteStaff(uid, pid);
+		
+		resp.sendRedirect(req.getContextPath()+UrlConst.PROJECT_STAFF);
+		
+	}
+
+	private void getProjectStaffAdd(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher(JspConst.PROJECT_STAFF_ADD)
+		.forward(req, resp);
+	}
+
+	private void getProjectStaff(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		List<ProjectUser> projectUsers =  service.findAllProjectStaff();
+		
+		req.setAttribute("projectUsers", projectUsers);
 		
 		req.getRequestDispatcher(JspConst.PROJECT_STAFF)
 			.forward(req, resp);
@@ -131,21 +158,57 @@ public class ProjectServlet extends HttpServlet {
 			
 			break;
 		case UrlConst.PROJECT_STAFF:
-			getProject(req, resp);
-			break;
-		case UrlConst.PROJECT_STAFF_DASHBOARD:
 			
 			break;
 		case UrlConst.PROJECT_STAFF_ADD:
+			postStaffAdd(req, resp);
+			break;
+		case UrlConst.PROJECT_STAFF_DELETE:
 			
 			break;
-		case UrlConst.PROJECT_STAFF_REMOVE:
-			
+		case UrlConst.PROJECT_STAFF_UPDATE:
+			postUpdateStaff(req, resp);
 			break;
 		default:
 			
 			break;
 		}
+	}
+
+	private void postUpdateStaff(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		int uid = Integer.parseInt(req.getParameter("uid"));
+		int pid = Integer.parseInt(req.getParameter("pid"));
+
+		ProjectUser pUser = service.findStaff(uid, pid);
+
+		pUser.setJoin_date(req.getParameter("join_date"));
+		pUser.setJoin_description(req.getParameter("join_description"));
+		
+		service.updateStaff(pUser, pid, uid);
+
+		resp.sendRedirect(req.getContextPath() + UrlConst.PROJECT_STAFF);
+	}
+
+	private void postStaffAdd(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		int uid = Integer.parseInt(req.getParameter("uid"));
+		int pid = Integer.parseInt(req.getParameter("pid"));
+		ProjectUser pUser = new ProjectUser();
+		
+		Project p = new Project();
+		p.setId(pid);
+		
+		User u = new User();
+		u.setId(uid);
+		
+		pUser.setUser(u);
+		pUser.setProject(p);
+		
+		pUser.setJoin_date(req.getParameter("join_date"));
+		pUser.setJoin_description(req.getParameter("join_description"));
+		
+		service.addStaff(pUser);
+		
+		resp.sendRedirect(req.getContextPath() + UrlConst.PROJECT_STAFF);
 	}
 
 	private void postAddNewProject(HttpServletRequest req, HttpServletResponse resp) throws IOException {
